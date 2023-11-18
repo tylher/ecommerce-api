@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -17,8 +18,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String userId;
 
     private String email;
 
@@ -30,9 +31,10 @@ public class User {
     private String lastName;
 
     private String role;
-    private String longitude;
-    private String latitude;
     private String phoneNumber;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Address> addresses;
 
     @CreationTimestamp
     private LocalDateTime created_at;
