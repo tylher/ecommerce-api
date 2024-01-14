@@ -10,7 +10,7 @@ public record CreateUserDto(
         @NotEmpty
         String password,
         @NotEmpty
-        @Pattern(regexp = "^(USER|ADMIN)")
+        @Pattern(regexp = "^(USER|ADMIN|USER,ADMIN)")
         String roles
 ) {
 }

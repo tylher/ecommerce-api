@@ -1,9 +1,11 @@
 package dev.damola.ecommerce.configuration;
 
 import dev.damola.ecommerce.configuration.Jwt.JwtAuthenticationFilter;
+import dev.damola.ecommerce.configuration.exception_handlers.CustomTokenAuthenticationEntryPoint;
 import dev.damola.ecommerce.service.CustomUserDetailService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,9 +21,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.util.Collections;
 
@@ -32,6 +36,11 @@ public class SecurityConfig {
     private CustomUserDetailService customUserDetailService;
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+//    @Autowired
+//    @Qualifier("handlerExceptionResolver")
+//    private HandlerExceptionResolver exceptionResolver;
+    @Autowired
+    CustomTokenAuthenticationEntryPoint customTokenAuthenticationEntryPoint;
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -55,7 +64,14 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(FormLoginConfigurer::disable)
-                .httpBasic(HttpBasicConfigurer::disable);
+                .httpBasic(HttpBasicConfigurer::disable)
+                .securityMatcher("*/**")
+                .authorizeHttpRequests(req->req
+                        .requestMatchers(new AntPathRequestMatcher("/auth/**"))
+                        .permitAll()
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(req->req.authenticationEntryPoint(customTokenAuthenticationEntryPoint));
         return http.build();
     }
 

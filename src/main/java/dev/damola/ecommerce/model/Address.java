@@ -17,6 +17,6 @@ public class Address {
     Coordinate coordinate;
 
     @ManyToOne
-    @JoinColumn(name = "userId")
-    User user;
+    @JoinColumn(name = "profileId")
+    Profile profile;
 }

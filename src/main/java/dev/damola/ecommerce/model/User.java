@@ -1,5 +1,6 @@
 package dev.damola.ecommerce.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,18 +26,10 @@ public class User {
 
     private String email;
 
+    @JsonIgnore
     private String password;
 
-    private String userName;
-
-    private String firstName;
-    private String lastName;
-
     private String roles;
-    private String phoneNumber;
-
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Address> addresses;
 
     @CreationTimestamp
     private LocalDateTime created_at;

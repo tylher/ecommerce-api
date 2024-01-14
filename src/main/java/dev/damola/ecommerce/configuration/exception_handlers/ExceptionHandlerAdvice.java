@@ -1,4 +1,4 @@
-package dev.damola.ecommerce.configuration;
+package dev.damola.ecommerce.configuration.exception_handlers;
 
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
@@ -47,7 +47,7 @@ public class ExceptionHandlerAdvice {
     @ExceptionHandler({HttpMessageNotReadableException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     Result handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        return new Result(false, ex.getMessage());
+        return new Result(false, ex.getMessage().substring(0,32));
     }
 
     @ExceptionHandler({HttpRequestMethodNotSupportedException.class})

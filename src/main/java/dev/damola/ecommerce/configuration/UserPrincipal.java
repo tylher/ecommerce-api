@@ -1,10 +1,7 @@
 package dev.damola.ecommerce.configuration;
 
 import dev.damola.ecommerce.model.User;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,10 +12,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
-@Getter
 @Builder
+@Getter
 @Setter
-public class UserPrincipal implements UserDetails {
+@AllArgsConstructor
+public class  UserPrincipal implements UserDetails {
     private User user;
 
     private String userId;
@@ -27,10 +25,10 @@ public class UserPrincipal implements UserDetails {
     private List<?extends GrantedAuthority> authorities;
 
     public UserPrincipal(User user){
-        userId = user.getUserId();
-        email = user.getEmail();
-        password = user.getPassword();
-        authorities = Arrays.stream(user.getRoles()
+        this.userId = user.getUserId();
+        this.email = user.getEmail();
+        this.password = user.getPassword();
+        this.authorities = Arrays.stream(user.getRoles()
                 .split(",")).map(role->new SimpleGrantedAuthority("ROLE_"+role.trim()))
                 .collect(Collectors.toList());
     }
