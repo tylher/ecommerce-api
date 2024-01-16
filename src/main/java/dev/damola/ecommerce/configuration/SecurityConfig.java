@@ -36,9 +36,6 @@ public class SecurityConfig {
     private CustomUserDetailService customUserDetailService;
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
-//    @Autowired
-//    @Qualifier("handlerExceptionResolver")
-//    private HandlerExceptionResolver exceptionResolver;
     @Autowired
     CustomTokenAuthenticationEntryPoint customTokenAuthenticationEntryPoint;
     @Bean

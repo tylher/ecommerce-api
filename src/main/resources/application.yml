@@ -16,3 +16,4 @@ spring:
     initialization-mode: always
     initialize: true
 jwt_secret: ${JWT_SECRET}
+clientId : ${CLIENT_ID}
