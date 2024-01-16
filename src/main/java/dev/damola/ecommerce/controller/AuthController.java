@@ -10,11 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.HashMap;
 
 @RestController
@@ -32,6 +31,12 @@ public class AuthController {
     @PostMapping("/login")
     ResponseEntity<?> userLogin(@Valid @RequestBody LoginDto loginDto){
         HashMap<String, Object> response = userService.login(loginDto);
+        return new ResponseEntity<Result>(new Result(true,"user created successfully",response)
+                , HttpStatus.OK);
+    }
+    @PostMapping("/signin")
+    ResponseEntity<?> googleUserLogin(@RequestParam(required = true) String credential) throws GeneralSecurityException, IOException {
+        HashMap<String, Object> response = userService.signInWithGoogle(credential);
         return new ResponseEntity<Result>(new Result(true,"user created successfully",response)
                 , HttpStatus.OK);
     }

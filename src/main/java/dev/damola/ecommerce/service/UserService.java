@@ -5,6 +5,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.gson.Gson;
 import dev.damola.ecommerce.Dto.CreateUserDto;
@@ -53,18 +54,19 @@ public class UserService {
         @Autowired
         JwtUtils jwtUtils;
 
-        @Value("clientId")
+        @Value("${clientId}")
         private String clientId;
         public User createUser(@Valid CreateUserDto createUserDto){
 
 
             try{
-             if(userRepository.existsByEmail(createUserDto.email())){
+             if(userRepository.existsByEmail(createUserDto.email().toLowerCase())){
                  throw new CustomException("user with this email exists already");
              }
              User user= userDtoToUserConverter.convert(createUserDto);
             assert user != null;
             user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setEmail(user.getEmail().toLowerCase());
              return userRepository.save(user);
             }
             catch (CustomException ex){
@@ -78,7 +80,7 @@ public class UserService {
 
         public HashMap<String, Object> login(LoginDto loginDto){
             try {
-                User savedUser = userRepository.findByEmail(loginDto.email()).orElseThrow(
+                User savedUser = userRepository.findByEmail(loginDto.email().toLowerCase()).orElseThrow(
                         () -> new NotfoundException("user with this email not found")
                 );
                 UsernamePasswordAuthenticationToken loginToken = new UsernamePasswordAuthenticationToken(loginDto.email(), loginDto.password());
@@ -99,18 +101,20 @@ public class UserService {
 
         public HashMap<String, Object> signInWithGoogle(String credential) throws GeneralSecurityException, IOException {
             try {
-                HttpTransport transport = GoogleNetHttpTransport.newTrustedTransport();
+                LOGGER.info("clientId: "+ clientId);
 
-                GoogleIdTokenVerifier googleIdTokenVerifier = new GoogleIdTokenVerifier.Builder(transport,
-                        GsonFactory.getDefaultInstance()
+                GoogleIdTokenVerifier googleIdTokenVerifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(),
+                        new GsonFactory()
                 ).setAudience(Collections.singleton(clientId)).build();
                 GoogleIdToken token = googleIdTokenVerifier.verify(credential);
                 if (token != null) {
                     Payload payload = token.getPayload();
                     String email = payload.getEmail();
                     String googleId = payload.getSubject();
+                    LOGGER.info(email);
+                    LOGGER.info(googleId);
 
-                    Optional<User> supposedUser = userRepository.findByEmail(email);
+                    Optional<User> supposedUser = userRepository.findByEmail(email.toLowerCase());
 
                     if (supposedUser.isPresent()) {
                         List<String> userRoles = Arrays.stream(supposedUser.get().getRoles().split("")).toList();
@@ -121,7 +125,6 @@ public class UserService {
                     User newUser = new User();
                     newUser.setEmail(email);
                     newUser.setRoles(Role.USER.getTypeValue());
-                    newUser.setUserId(googleId);
 
                     User savedUser = userRepository.save(newUser);
                     List<String> userRoles = Arrays.stream(savedUser.getRoles().split("")).toList();
