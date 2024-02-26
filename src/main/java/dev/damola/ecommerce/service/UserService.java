@@ -113,13 +113,9 @@ public class UserService {
                     String googleId = payload.getSubject();
                     LOGGER.info(email);
                     LOGGER.info(googleId);
-
                     Optional<User> supposedUser = userRepository.findByEmail(email.toLowerCase());
-
                     if (supposedUser.isPresent()) {
-                        List<String> userRoles = Arrays.stream(supposedUser.get().getRoles().split("")).toList();
-                        return getUserAndToken(supposedUser.get(), supposedUser.get().getUserId()
-                                , supposedUser.get().getEmail(), userRoles);
+                     return checkAndProcessIfGoogleEmailExists(supposedUser.get());
                     }
 
                     User newUser = new User();
@@ -144,5 +140,13 @@ public class UserService {
             map.put("token", jwtToken);
             map.put("user", user);
             return map;
+        }
+
+        private HashMap<String,Object> checkAndProcessIfGoogleEmailExists(User supposedUser){
+                List<String> userRoles = Arrays.stream(supposedUser.getRoles().split("")).toList();
+                return getUserAndToken(supposedUser, supposedUser.getUserId()
+                        , supposedUser.getEmail(), userRoles);
+
+
         }
 }

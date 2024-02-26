@@ -1,6 +1,7 @@
 package dev.damola.ecommerce.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +10,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Data
@@ -30,6 +29,9 @@ public class User {
     private String password;
 
     private String roles;
+
+    @JsonIncludeProperties({"imageUrl"})
+    private ImageMetaData image;
 
     @CreationTimestamp
     private LocalDateTime created_at;
